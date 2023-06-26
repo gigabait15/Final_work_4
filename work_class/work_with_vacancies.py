@@ -74,6 +74,7 @@ class Work_With_Vacancies:
 
     def save_sj(self):
         """Выбираем данные с которыми будет работать далее и сохраняем их словарь"""
+
         with open(f'json_dir/SuperJob.json', 'r', encoding="utf-8") as file:
             data = json.load(file)
             for index, value in enumerate(data["items"]):
