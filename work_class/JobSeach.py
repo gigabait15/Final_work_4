@@ -1,60 +1,53 @@
-from work_class.HH import HH
-from work_class.Super_job import SuperJob
+from pprint import pprint
+from work_class.work_with_vacancies import Work_With_Vacancies
+from work_class.JSON_LD import JSONLD
+
 
 class JobSearch:
     def __init__(self):
-        self.hh = HH()
-        self.superjob = SuperJob()
-        self.job_platforms = {
-            "1": self.hh,
-            "2": self.superjob
-        }
+        self.wwv = Work_With_Vacancies()
+        self.jld = JSONLD()
+        self.hh = self.wwv.save_hh()
+        self.sj = self.wwv.save_sj()
+        self.all_job_listings = self.wwv.job_hh + self.wwv.job_sj
 
     def display_menu(self):
         """Функция выбора пользователем дальнейших действий"""
         print("=== Меню поиска работы ===")
-        print("1. Получить список вакансий с HeadHunter (hh.ru)")
-        print("2. Получить список вакансий с SuperJob (superjob.ru)")
-        print("3. Поиск вакансий")
-        print("4. Получить топ N вакансий по зарплате(указать количество вакансий)")
-        print("5. Получить отсортированный список вакансий(указать количество вакансий)")
-        print("6. Поиск вакансий по ключевым словам")
-        print("7. Добавление новой вакансии")
-        print("8. Удаление вакансии")
+        print("1. Получить список вакансий")
+        print("2. Поиск вакансий")
+        print("3. Получить топ N вакансий по зарплате(указать количество вакансий)")
+        print("4. Получить отсортированный список вакансий(указать количество вакансий)")
+        print("5. Поиск вакансий по ключевым словам")
+        print("6. Добавление новой вакансии")
+        print("7. Удаление вакансии")
         print("0. Выход")
 
-    def fetch_job_listings(self, platform):
-        """Функция для получения вакансий с платформы
-        и сохранения их в json файл по названию платформы"""
-        if platform not in self.job_platforms:
-            print("Недопустимая платформа. Пожалуйста, попробуйте ещё раз.")
-            return
+    def run_listings(self):
+        """Функция для записи списков рабочего класса """
+        self.wwv.save_hh()
+        self.wwv.save_sj()
 
-        job_platform = self.job_platforms[platform]
-        filename = f"{job_platform.__class__.__name__}_listings"
-        job_platform.dump_json(filename)
-        print(f"Список вакансий получен с {job_platform.__class__.__name__} и сохранён в файле {filename}.json")
-
-    def load_jod_listings(self):
-        """Функция для открытия записанных файлов и объединения их в один список"""
-        filename1 = f"{self.job_platforms['1'].__class__.__name__}_listings"
-        filename2 = f"{self.job_platforms['2'].__class__.__name__}_listings"
-        self.hh.loads_json(filename1)
-        self.superjob.loads_json(filename2)
-        self.all_job_listings = self.hh.all_job + self.superjob.all_job
-
+    def fetch_job_listings(self):
+        """Функция для получения вакансий в полном формате"""
+        self.run_listings()
+        pprint(self.all_job_listings)
 
     def search_job_listings(self, query):
         """Функция для поиска по названию вакансии"""
+        self.run_listings()
         if not query:
             print("Вы не ввели поисковый запрос. Пожалуйста, попробуйте ещё раз.")
             return
-        self.load_jod_listings()
+
         matching_listings = [item for item in self.all_job_listings if query.lower() in item["название вакансии"].lower()]
         if matching_listings:
             print(f"Найдено {len(matching_listings)} вакансий, соответствующих запросу '{query}':")
             for item in matching_listings:
-                print(*item.values())
+                print(f"Должность: {item['название вакансии']}\n"
+                      f"Ссылка для отклика: {item['ссылка на вакансию']}\n"
+                      f"Размер заработной платы: {item['зарплата']} {item['валюта']}\n"
+                      f"Адрес: {item['адрес']}\n")
         else:
             print("Вакансий, соответствующих поисковому запросу, не найдено.")
 
@@ -65,30 +58,36 @@ class JobSearch:
             print("Введено недопустимое значение. Пожалуйста, введите число.")
             return
 
-        self.load_jod_listings()
-
-        sorted_listings = sorted(self.all_job_listings, key=lambda x: int(x["зарплата"]), reverse=True)
+        self.run_listings()
+        sorted_listings = sorted(self.all_job_listings, key=lambda x: int(x["зарплата"])
+                                    if x.get("зарплата") else 0, reverse=True)
         top_n_listings = sorted_listings[:n]
 
         if top_n_listings:
-            print(f"Топ {n} вакансий по зарплате"
+            print(f"Топ {n} вакансий по зарплате "
                   f"(указана средняя зарплата, для получения более точной информации перейти по ссылке):")
-            for item in top_n_listings:
-                print(*item.values())
+            for num, item in enumerate(top_n_listings):
+                print(f"Номер {num + 1}\n"
+                      f"Должность: {item['название вакансии']}\n"
+                      f"Ссылка для отклика: {item['ссылка на вакансию']}\n"
+                      f"Размер заработной платы: {item['зарплата']} {item['валюта']}\n"
+                      f"Адрес: {item['адрес']}\n")
         else:
             print("Вакансий не найдено.")
 
     def get_sorted_job_listings(self, n):
         """Функция выводит отсортированный список вакансий"""
-        self.load_jod_listings()
-
+        self.run_listings()
         sorted_listings = sorted(self.all_job_listings, key=lambda x: x["название вакансии"])
         top_n_listings = sorted_listings[:int(n)]
 
         if top_n_listings:
             print("Отсортированный список вакансий:")
             for item in top_n_listings:
-                print(*item.values())
+                print(f"Должность: {item['название вакансии']}\n"
+                      f"Ссылка для отклика: {item['ссылка на вакансию']}\n"
+                      f"Размер заработной платы: {item['зарплата']} {item['валюта']}\n"
+                      f"Адрес: {item['адрес']}\n")
         else:
             print("Вакансий не найдено.")
 
@@ -98,7 +97,7 @@ class JobSearch:
             print("Вы не ввели ключевые слова. Пожалуйста, попробуйте ещё раз.")
             return
 
-        self.load_jod_listings()
+        self.run_listings()
         matching_listings = []
         for item in self.all_job_listings:
             item_values = [value for value in item.values()]
@@ -108,85 +107,84 @@ class JobSearch:
         if matching_listings:
             print(f"Найдено {len(matching_listings)} вакансий, соответствующих ключевым словам:")
             for item in matching_listings:
-                print(item)
-                print()
+                print(f"Должность: {item['название вакансии']}\n"
+                      f"Ссылка для отклика: {item['ссылка на вакансию']}\n"
+                      f"Размер заработной платы: {item['зарплата']} {item['валюта']}\n"
+                      f"Адрес: {item['адрес']}\n")
         else:
             print("Вакансий, соответствующих ключевым словам, не найдено.")
 
-
-    def add_job_listing(self, job_listing):
+    def add_job_listing(self, pick: int, job_listing: dict):
         """Функция добавляет вакансию в список"""
-        default_values = {
-        "название вакансии": "","ссылка на вакансию": "","зарплата": 0,
-                      "валюта": "","требования": "","обязанности": "","город": "","улица": "",
-                      "метро": "","опыт": "","тип занятости": "","название компании": ""
-        }
+        self.jld.json_add(pick, job_listing)
 
-        # Заполняем отсутствующие значения по умолчанию
-        for key, value in default_values.items():
-            job_listing[key] = job_listing.get(key, value)
-
-        self.all_job_listings.append(job_listing)
-        print(f"Вакансия успешно добавлена.{job_listing}")
-
-    def remove_job_listing(self, job_listing):
+    def remove_job_listing(self, pick: int, job_listing: dict):
         """Функция удаляет вакансию из списка"""
-        if job_listing in self.all_job_listings:
-            self.all_job_listings.remove(job_listing)
-            print("Вакансия успешно удалена.")
-        else:
-            print("Указанная вакансия не найдена в списке.")
+        self.jld.json_del(pick, job_listing)
 
     def run(self):
         """Функция для взаимодействия с пользователем"""
         while True:
             self.display_menu()
-            choice = str(input("Введите ваш выбор: "))
+            choice = int(input("Введите ваш выбор: "))
 
-            if choice == "0":
+            if choice == 0:
                 print("Выход...")
                 break
 
-            elif choice == "1" or choice == "2":
-                self.fetch_job_listings(choice)
+            elif choice == 1:
+                self.fetch_job_listings()
 
-            elif choice == "3":
+            elif choice == 2:
                 query = input("Введите поисковый запрос"
                               "(указать название вакансии или ключевое слово в названии): ")
                 self.search_job_listings(query)
 
-            elif choice == "4":
-                n = input("Введите количество вакансий: ")
+            elif choice == 3:
+                n = int(input("Введите количество вакансий: "))
                 self.get_top_job_listings_by_salary(n)
 
-            elif choice == "5":
+            elif choice == 4:
                 n = input("Введите число вакансий для вывода: ")
                 self.get_sorted_job_listings(n)
 
-            elif choice == "6":
+            elif choice == 5:
                 keywords = input("Введите ключевые слова (через ;): ").split(";")
                 print("вывод вакансий будет по всем содержащимся ключевым словам в вакансии")
                 self.search_job_listings_by_keywords(keywords)
-            elif choice == "7":
+            elif choice == 6:
+                print("введите файл вакансии:\n"
+                      "1 - HH\n"
+                      "2 - SuperJob")
+                pick = int(input())
                 print("введите данные для новой вакансии")
-                job_listing = {"название вакансии": input("название вакансии:"), "ссылка на вакансию": input("ссылка на вакансию:"),
-                               "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
-                            "требования": input("требования:"), "обязанности": input("обязанности:"),
-                               "город": input("город:"), "улица":input("улица:"),
-                            "метро": input("метро:"), "опыт": input("опыт:"), "тип занятости": input("тип занятости:"),
-                               "название компании": input("название компании:")}
-                self.add_job_listing(job_listing)
-            elif choice == "8":
+
+                job_listing = {
+                    "название вакансии": input("название вакансии:"),
+                    "ссылка на вакансию": input("ссылка на вакансию:"),
+                    "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
+                    "требования": input("требования:"), "обязанности": input("обязанности:"),
+                    "адрес": input("адрес:"), "метро": input("метро:"),
+                    "требуемый опыт": input("требуемый опыт:"),
+                    "название компании": input("название компании:"),
+                    "город вакансии": input("город вакансии:")
+                }
+                self.add_job_listing(pick, job_listing)
+            elif choice == 7:
+                print("введите файл вакансии:\n"
+                      "1 - HH\n"
+                      "2 - SuperJob")
+                pick = int(input())
                 print("введите данные для удаления вакансии")
-                job_listing = {"название вакансии": input("название вакансии:"),
-                               "ссылка на вакансию": input("ссылка на вакансию:"),
-                               "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
-                               "требования": input("требования:"), "обязанности": input("обязанности:"),
-                               "город": input("город:"), "улица": input("улица:"),
-                               "метро": input("метро:"), "опыт": input("опыт:"),
-                               "тип занятости": input("тип занятости:"),
-                               "название компании": input("название компании:")}
-                self.remove_job_listing(job_listing)
+                job_listing = {
+                    "название вакансии": input("название вакансии:"), "ссылка на вакансию": input("ссылка на вакансию:"),
+                    "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
+                    "требования": input("требования:"), "обязанности": input("обязанности:"),
+                    "адрес": input("адрес:"), "метро": input("метро:"),
+                    "требуемый опыт": input("требуемый опыт:"), "название компании": input("название компании:"),
+                    "город вакансии": input("город вакансии:")
+                }
+                self.remove_job_listing(pick, job_listing)
             else:
                 print("Недопустимый выбор. Пожалуйста, попробуйте ещё раз.")
 
