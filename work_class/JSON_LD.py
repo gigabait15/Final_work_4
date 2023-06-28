@@ -25,8 +25,7 @@ class JSONLD(Abstract_JSON):
         choice = self.choices[pick]
         with open(f'../json_dir/{choice.__class__.__name__}.json', 'r', encoding="utf-8") as file:
             data = json.load(file)
-
-        return data
+            return data
 
     def json_del(self, pick: int, value: dict):
         """Функция для удаления вакансии из файла"""
@@ -51,6 +50,5 @@ class JSONLD(Abstract_JSON):
 
         with open(f'../json_dir/{choice.__class__.__name__}.json', 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=2)
-
 
 
