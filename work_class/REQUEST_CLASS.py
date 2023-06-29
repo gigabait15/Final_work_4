@@ -1,6 +1,7 @@
 import os
 import requests
 import time
+
 from work_class.ABSTRACT_CLASS import Abstract_basic
 
 
@@ -32,7 +33,7 @@ class SuperJob(Abstract_basic):
         super().__init__()
         self.url = "https://api.superjob.ru/2.0/vacancies/"  # url сайта
         self.__api_key: str = os.getenv('API_S')  # секретный ключ для сайта
-        self.__headers = {"X-Api-App-Id": self.__api_key}    # Передача ключа для входа
+        self.__headers = {"X-Api-App-Id": self.__api_key}  # Передача ключа для входа
         self.__params = {"POST": "/2.0/favorites/ HTTP/1.1",
                          "Host": "api.superhob.ru",
                          "Authorization": "Bearer r.000000010000001.example.access_token",
@@ -53,3 +54,5 @@ class SuperJob(Abstract_basic):
             self.all_job.extend(items)
             page += 1
         return self.all_job
+
+

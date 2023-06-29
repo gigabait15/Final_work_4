@@ -19,6 +19,7 @@ class JSONLD(Abstract_JSON):
         choice = self.choices[pick]
         with open(f'../json_dir/{choice.__class__.__name__}.json', 'w', encoding="utf-8") as file:
             json.dump({"items": choice.requests_json()}, file, ensure_ascii=False, indent=2)
+        print(f"Файл записал: {choice.__class__.__name__}.json' ")
 
     def json_get(self, pick: int):
         """Функция для получения вакансии из файла"""

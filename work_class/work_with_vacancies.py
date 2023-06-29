@@ -23,7 +23,6 @@ class Work_With_Vacancies:
 
     def save_hh(self):
         """Выбираем данные с которыми будет работать далее и сохраняем их словарь"""
-
         j_open = self.JSONLD
         exchange_rates = {
             "Уточнить у работодателя": 0, "KZT": 0.19, "BYR": 33.07,

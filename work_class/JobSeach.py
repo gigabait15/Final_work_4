@@ -11,7 +11,8 @@ class JobSearch:
         self.sj = self.wwv.save_sj()
         self.all_job_listings = self.wwv.job_hh + self.wwv.job_sj
 
-    def display_menu(self):
+    @staticmethod
+    def display_menu():
         """Функция выбора пользователем дальнейших действий"""
         print("=== Меню поиска работы ===")
         print("1. Получить список вакансий")
@@ -21,6 +22,7 @@ class JobSearch:
         print("5. Поиск вакансий по ключевым словам")
         print("6. Добавление новой вакансии")
         print("7. Удаление вакансии")
+        print("8. Сохранить вакансию в файл")
         print("0. Выход")
 
     def run_listings(self):
@@ -40,7 +42,8 @@ class JobSearch:
             print("Вы не ввели поисковый запрос. Пожалуйста, попробуйте ещё раз.")
             return
 
-        matching_listings = [item for item in self.all_job_listings if query.lower() in item["название вакансии"].lower()]
+        matching_listings = [item for item in self.all_job_listings if
+                             query.lower() in item["название вакансии"].lower()]
         if matching_listings:
             print(f"Найдено {len(matching_listings)} вакансий, соответствующих запросу '{query}':")
             for item in matching_listings:
@@ -60,7 +63,7 @@ class JobSearch:
 
         self.run_listings()
         sorted_listings = sorted(self.all_job_listings, key=lambda x: int(x["зарплата"])
-                                    if x.get("зарплата") else 0, reverse=True)
+        if x.get("зарплата") else 0, reverse=True)
         top_n_listings = sorted_listings[:n]
 
         if top_n_listings:
@@ -159,16 +162,14 @@ class JobSearch:
                 pick = int(input())
                 print("введите данные для новой вакансии")
 
-                job_listing = {
-                    "название вакансии": input("название вакансии:"),
-                    "ссылка на вакансию": input("ссылка на вакансию:"),
-                    "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
-                    "требования": input("требования:"), "обязанности": input("обязанности:"),
-                    "адрес": input("адрес:"), "метро": input("метро:"),
-                    "требуемый опыт": input("требуемый опыт:"),
-                    "название компании": input("название компании:"),
-                    "город вакансии": input("город вакансии:")
-                }
+                job_listing =  \
+                    {"название вакансии": input("название вакансии:"),
+                     "ссылка на вакансию": input("ссылка на вакансию:"),
+                     "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
+                     "требования": input("требования:"), "обязанности": input("обязанности:"), "адрес": input("адрес:"),
+                     "метро": input("метро:"), "требуемый опыт": input("требуемый опыт:"),
+                     "название компании": input("название компании:"), "город вакансии": input("город вакансии:")
+                     }
                 self.add_job_listing(pick, job_listing)
             elif choice == 7:
                 print("введите файл вакансии:\n"
@@ -176,19 +177,25 @@ class JobSearch:
                       "2 - SuperJob")
                 pick = int(input())
                 print("введите данные для удаления вакансии")
-                job_listing = {
-                    "название вакансии": input("название вакансии:"), "ссылка на вакансию": input("ссылка на вакансию:"),
-                    "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
-                    "требования": input("требования:"), "обязанности": input("обязанности:"),
-                    "адрес": input("адрес:"), "метро": input("метро:"),
-                    "требуемый опыт": input("требуемый опыт:"), "название компании": input("название компании:"),
-                    "город вакансии": input("город вакансии:")
-                }
+
+                job_listing = \
+                    {"название вакансии": input("название вакансии:"),
+                     "ссылка на вакансию": input("ссылка на вакансию:"),
+                     "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
+                     "требования": input("требования:"), "обязанности": input("обязанности:"), "адрес": input("адрес:"),
+                     "метро": input("метро:"), "требуемый опыт": input("требуемый опыт:"),
+                     "название компании": input("название компании:"), "город вакансии": input("город вакансии:")
+                     }
+
                 self.remove_job_listing(pick, job_listing)
+            elif choice == 8:
+                print("Сохранить файл с вакансиями:\n"
+                      "1 - HH\n"
+                      "2 - SuperJob")
+                pick = int(input("введите номер:"))
+                self.jld.json_save(pick)
+
             else:
                 print("Недопустимый выбор. Пожалуйста, попробуйте ещё раз.")
 
-if __name__ == '__main__':
-    js = JobSearch()
-    js.run()
 
