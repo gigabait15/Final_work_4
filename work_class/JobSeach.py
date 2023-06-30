@@ -1,3 +1,4 @@
+import os
 from pprint import pprint
 from work_class.work_with_vacancies import Work_With_Vacancies
 from work_class.JSON_LD import JSONLD
@@ -63,7 +64,7 @@ class JobSearch:
 
         self.run_listings()
         sorted_listings = sorted(self.all_job_listings, key=lambda x: int(x["зарплата"])
-        if x.get("зарплата") else 0, reverse=True)
+            if x.get("зарплата") else 0, reverse=True)
         top_n_listings = sorted_listings[:n]
 
         if top_n_listings:
@@ -155,39 +156,49 @@ class JobSearch:
                 keywords = input("Введите ключевые слова (через ;): ").split(";")
                 print("вывод вакансий будет по всем содержащимся ключевым словам в вакансии")
                 self.search_job_listings_by_keywords(keywords)
+
             elif choice == 6:
-                print("введите файл вакансии:\n"
-                      "1 - HH\n"
-                      "2 - SuperJob")
-                pick = int(input())
-                print("введите данные для новой вакансии")
+                if not os.path.exists(__class__.directory):
+                    print("С начало сохраните файл")
+                else:
+                    print("введите файл вакансии:\n"
+                          "1 - HH\n"
+                          "2 - SuperJob")
+                    pick = int(input())
+                    print("введите данные для новой вакансии")
 
-                job_listing =  \
-                    {"название вакансии": input("название вакансии:"),
-                     "ссылка на вакансию": input("ссылка на вакансию:"),
-                     "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
-                     "требования": input("требования:"), "обязанности": input("обязанности:"), "адрес": input("адрес:"),
-                     "метро": input("метро:"), "требуемый опыт": input("требуемый опыт:"),
-                     "название компании": input("название компании:"), "город вакансии": input("город вакансии:")
-                     }
-                self.add_job_listing(pick, job_listing)
+                    job_listing = \
+                        {"название вакансии": input("название вакансии:"),
+                         "ссылка на вакансию": input("ссылка на вакансию:"),
+                         "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
+                         "требования": input("требования:"), "обязанности": input("обязанности:"), "адрес": input("адрес:"),
+                         "метро": input("метро:"), "требуемый опыт": input("требуемый опыт:"),
+                         "название компании": input("название компании:"), "город вакансии": input("город вакансии:")
+                         }
+                    self.add_job_listing(pick, job_listing)
+
             elif choice == 7:
-                print("введите файл вакансии:\n"
-                      "1 - HH\n"
-                      "2 - SuperJob")
-                pick = int(input())
-                print("введите данные для удаления вакансии")
+                if not os.path.exists(__class__.directory):
+                    print("С начало сохраните файл")
+                else:
+                    print("введите файл вакансии:\n"
+                          "1 - HH\n"
+                          "2 - SuperJob")
+                    pick = int(input())
+                    print("введите данные для удаления вакансии")
 
-                job_listing = \
-                    {"название вакансии": input("название вакансии:"),
-                     "ссылка на вакансию": input("ссылка на вакансию:"),
-                     "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
-                     "требования": input("требования:"), "обязанности": input("обязанности:"), "адрес": input("адрес:"),
-                     "метро": input("метро:"), "требуемый опыт": input("требуемый опыт:"),
-                     "название компании": input("название компании:"), "город вакансии": input("город вакансии:")
-                     }
+                    job_listing = \
+                        {"название вакансии": input("название вакансии:"),
+                         "ссылка на вакансию": input("ссылка на вакансию:"),
+                         "зарплата": int(input("зарплата:")), "валюта": input("валюта:"),
+                         "требования": input("требования:"), "обязанности": input("обязанности:"),
+                         "адрес": input("адрес:"), "метро": input("метро:"),
+                         "требуемый опыт": input("требуемый опыт:"), "название компании": input("название компании:"),
+                         "город вакансии": input("город вакансии:")
+                         }
 
-                self.remove_job_listing(pick, job_listing)
+                    self.remove_job_listing(pick, job_listing)
+
             elif choice == 8:
                 print("Сохранить файл с вакансиями:\n"
                       "1 - HH\n"
