@@ -33,16 +33,13 @@ class JobSearch:
 
     def fetch_job_listings(self):
         """Функция для получения вакансий в полном формате"""
-        self.run_listings()
         pprint(self.all_job_listings)
 
     def search_job_listings(self, query):
         """Функция для поиска по названию вакансии"""
-        self.run_listings()
         if not query:
             print("Вы не ввели поисковый запрос. Пожалуйста, попробуйте ещё раз.")
             return
-
         matching_listings = [item for item in self.all_job_listings if
                              query.lower() in item["название вакансии"].lower()]
         if matching_listings:
@@ -61,8 +58,6 @@ class JobSearch:
         if not isinstance(n, int):
             print("Введено недопустимое значение. Пожалуйста, введите число.")
             return
-
-        self.run_listings()
         sorted_listings = sorted(self.all_job_listings, key=lambda x: int(x["зарплата"])
             if x.get("зарплата") else 0, reverse=True)
         top_n_listings = sorted_listings[:n]
@@ -81,7 +76,7 @@ class JobSearch:
 
     def get_sorted_job_listings(self, n):
         """Функция выводит отсортированный список вакансий"""
-        self.run_listings()
+
         sorted_listings = sorted(self.all_job_listings, key=lambda x: x["название вакансии"])
         top_n_listings = sorted_listings[:int(n)]
 
@@ -100,8 +95,6 @@ class JobSearch:
         if not keywords:
             print("Вы не ввели ключевые слова. Пожалуйста, попробуйте ещё раз.")
             return
-
-        self.run_listings()
         matching_listings = []
         for item in self.all_job_listings:
             item_values = [value for value in item.values()]
@@ -128,6 +121,7 @@ class JobSearch:
 
     def run(self):
         """Функция для взаимодействия с пользователем"""
+        self.run_listings()
         while True:
             self.display_menu()
             choice = int(input("Введите ваш выбор: "))
