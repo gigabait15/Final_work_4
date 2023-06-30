@@ -1,6 +1,5 @@
-import json
 import re
-from work_class.JSON_LD import JSONLD
+from work_class.REQUEST_CLASS import HH, SuperJob
 
 
 class Work_With_Vacancies:
@@ -19,17 +18,16 @@ class Work_With_Vacancies:
         self.__experience = None  # требуемый опыт работы для данной вакансии
         self.__employer = None  # название компании
         self.__area = None  # город вакансии
-        self.JSONLD = JSONLD()
 
     def save_hh(self):
         """Выбираем данные с которыми будет работать далее и сохраняем их словарь"""
-        j_open = self.JSONLD
+        j_open = HH()
         exchange_rates = {
             "Уточнить у работодателя": 0, "KZT": 0.19, "BYR": 33.07,
             "KGS": 0.96, "UZS": 0.0073, "USD": 84.55, "EUR": 91.05,
             "AZN": 50.52
         }
-        for num, value in enumerate(j_open.json_get(1)['items']):
+        for num, value in enumerate(j_open.requests_json()):
             self.__name = value['name']  # название вакансии
             salary = value['salary']  # Данные по заработное плате
             salary_from = salary['from'] if isinstance(value['salary'], dict) \
@@ -65,21 +63,21 @@ class Work_With_Vacancies:
     def save_sj(self):
         """Выбираем данные с которыми будет работать далее и сохраняем их словарь"""
 
-        j_open = self.JSONLD
-        for index, value in enumerate(j_open.json_get(2)['items']):
+        j_open = SuperJob()
+        for index, value in enumerate(j_open.requests_json()):
             self.__name = value["profession"]  # название вакансии
             self.__link = value["link"]  # ссылка на вакансию
             s_from = value["payment_from"] if value["payment_from"] \
-                                              is not None else 0  # начальный порог заработной платы
+                is not None else 0  # начальный порог заработной платы
             s_to = value["payment_to"] if value["payment_to"] \
-                                          is not None else 0  # итоговый порог заработной платы
+                is not None else 0  # итоговый порог заработной платы
             self.__correct_salary = s_from if s_from > s_to else s_to
             self.__currency = value["currency"]  # валюта заработной платы
             self.__responsibility = value['vacancyRichText']  # обязанности. требования. предложения
             self.__responsibility = re.sub('<.*?>', '', self.__responsibility) \
                 if self.__responsibility is not None else ""
             self.__address = value["address"] if value["address"] \
-                                                 is not None else "Уточнить у работодателя"  # адрес вакансии
+                is not None else "Уточнить у работодателя"  # адрес вакансии
             self.__metro = value["metro"][0]["title"] if value["metro"] != [] \
                 else "Уточнить у работодателя"  # станция метро на которой находиться вакансия
             self.__experience = value["experience"]["title"]  # требуемый опыт работы для данной вакансии
