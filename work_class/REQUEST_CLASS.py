@@ -28,11 +28,14 @@ class HH(Abstract_basic):
 
 
 class SuperJob(Abstract_basic):
+    API_S = 'v3.r.137579206' \
+            '.b9b1535401cd0a3b55a6d9ee3eeb76d123905c0a' \
+            '.b605aad0bf54490b16ddef4a08019ad8e04e75c4'
 
     def __init__(self):
         super().__init__()
         self.url = "https://api.superjob.ru/2.0/vacancies/"  # url сайта
-        self.__api_key: str = os.getenv('API_S')  # секретный ключ для сайта
+        self.__api_key: str = __class__.API_S  # os.getenv('API_S')  # секретный ключ для сайта
         self.__headers = {"X-Api-App-Id": self.__api_key}  # Передача ключа для входа
         self.__params = {"POST": "/2.0/favorites/ HTTP/1.1",
                          "Host": "api.superhob.ru",
